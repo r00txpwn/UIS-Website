@@ -23,7 +23,6 @@ Relevant migrations for this release (in order):
 - `20260312140000_news_posts.sql` – `featured_on_home` on `news_posts`
 - `20260312180000_homepage_slides.sql` – `homepage_slides` table + `homepage` storage bucket
 - `20260312181000_site_settings.sql` – `site_settings` table
-- `20260312182000_footer_links.sql` – `footer_links` table
 - `20260312183000_contact_messages.sql` – `contact_messages` table
 
 ### Option B: Run SQL scripts manually (e.g. new env without migrations)
@@ -33,8 +32,7 @@ If you prefer run-once scripts instead of migrations, run these in the **Supabas
 1. `supabase/run_news_posts_once.sql` – adds `featured_on_home` to `news_posts`
 2. `supabase/run_homepage_slides_once.sql` – `homepage_slides` + `homepage` bucket
 3. `supabase/run_site_settings_once.sql` – `site_settings`
-4. `supabase/run_footer_links_once.sql` – `footer_links`
-5. `supabase/run_contact_messages_once.sql` – `contact_messages`
+4. `supabase/run_contact_messages_once.sql` – `contact_messages`
 
 **Note:** If `news_posts` or other tables already exist from a previous run, you may need to run only the parts that add new columns/tables (e.g. just the `ALTER TABLE` for `featured_on_home`, or skip scripts that would recreate existing tables).
 
@@ -97,7 +95,7 @@ Fix any TypeScript or build errors before deploying the frontend.
 
 2. **Header / Footer**
    - Logo, footer about text, address, phone, emails come from `site_settings`.
-   - Quick Links and Services in the footer come from `footer_links` (or fallbacks if empty).
+   - Quick Links and Services in the footer are hardcoded.
 
 3. **Contact form**
    - Submit a test message → row appears in `contact_messages`.
@@ -105,7 +103,7 @@ Fix any TypeScript or build errors before deploying the frontend.
    - If email is configured, confirm the admin inbox receives the notification.
 
 4. **Admin**
-   - **Homepage Slides**, **Site Settings**, **Footer Links**, **Contact Messages** are in the sidebar and load without errors.
+   - **Homepage Slides**, **Site Settings**, **Contact Messages** are in the sidebar and load without errors.
 
 ---
 

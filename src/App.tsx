@@ -25,7 +25,6 @@ import ClientsAdmin from './pages/admin/ClientsAdmin';
 import SuppliersAdmin from './pages/admin/SuppliersAdmin';
 import HomepageSlidesAdmin from './pages/admin/HomepageSlidesAdmin';
 import SiteSettingsAdmin from './pages/admin/SiteSettingsAdmin';
-import FooterLinksAdmin from './pages/admin/FooterLinksAdmin';
 import ContactMessagesAdmin from './pages/admin/ContactMessagesAdmin';
 
 function App() {
@@ -43,7 +42,6 @@ function App() {
         <Route path="/admin/news" element={<ProtectedRoute><NewsAdmin /></ProtectedRoute>} />
         <Route path="/admin/homepage-slides" element={<ProtectedRoute><HomepageSlidesAdmin /></ProtectedRoute>} />
         <Route path="/admin/site-settings" element={<ProtectedRoute><SiteSettingsAdmin /></ProtectedRoute>} />
-        <Route path="/admin/footer-links" element={<ProtectedRoute><FooterLinksAdmin /></ProtectedRoute>} />
         <Route path="/admin/contact-messages" element={<ProtectedRoute><ContactMessagesAdmin /></ProtectedRoute>} />
         <Route path="/admin/clients" element={<ProtectedRoute><ClientsAdmin /></ProtectedRoute>} />
         <Route path="/admin/suppliers" element={<ProtectedRoute><SuppliersAdmin /></ProtectedRoute>} />
