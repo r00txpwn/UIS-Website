@@ -9,26 +9,49 @@ import Accreditations from './pages/Accreditations';
 import About from './pages/About';
 import BusinessEthics from './pages/BusinessEthics';
 import Contact from './pages/Contact';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/admin/Dashboard';
+import ServicesAdmin from './pages/admin/ServicesAdmin';
+import AccreditationsAdmin from './pages/admin/AccreditationsAdmin';
+import PoliciesAdmin from './pages/admin/PoliciesAdmin';
+import ProductsAdmin from './pages/admin/ProductsAdmin';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white flex flex-col">
-        <Header />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/clients" element={<Clients />} />
-            <Route path="/accreditations" element={<Accreditations />} />
-            <Route path="/business-ethics" element={<BusinessEthics />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/services/fleet-management" element={<FleetManagement />} />
-            <Route path="/services/ndt-inspection" element={<NDTInspection />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin/services" element={<ProtectedRoute><ServicesAdmin /></ProtectedRoute>} />
+        <Route path="/admin/accreditations" element={<ProtectedRoute><AccreditationsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/policies" element={<ProtectedRoute><PoliciesAdmin /></ProtectedRoute>} />
+        <Route path="/admin/products" element={<ProtectedRoute><ProductsAdmin /></ProtectedRoute>} />
+
+        {/* Public Routes */}
+        <Route path="/*" element={
+          <div className="min-h-screen bg-white flex flex-col">
+            <Header />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/clients" element={<Clients />} />
+                <Route path="/accreditations" element={<Accreditations />} />
+                <Route path="/business-ethics" element={<BusinessEthics />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/services/fleet-management" element={<FleetManagement />} />
+                <Route path="/services/ndt-inspection" element={<NDTInspection />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        } />
+      </Routes>
     </Router>
   );
 }
