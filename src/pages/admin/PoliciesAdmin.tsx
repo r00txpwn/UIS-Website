@@ -8,7 +8,6 @@ interface Policy {
   title: string;
   description: string;
   pdf_url: string;
-  category: string;
   display_order: number;
 }
 
@@ -88,7 +87,7 @@ export default function PoliciesAdmin() {
           <button
             onClick={() => {
               setEditingId('new');
-              setFormData({ title: '', description: '', pdf_url: '', category: 'general', display_order: policies.length });
+              setFormData({ title: '', description: '', pdf_url: '', display_order: policies.length });
             }}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
           >
@@ -163,15 +162,6 @@ export default function PoliciesAdmin() {
                   </p>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <input
-                  type="text"
-                  value={formData.category || ''}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                />
-              </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={loading} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
                   <Save className="w-4 h-4" />
@@ -191,7 +181,7 @@ export default function PoliciesAdmin() {
             <thead className="bg-slate-50 border-b">
               <tr>
                 <th className="text-left px-6 py-3 text-sm font-medium">Title</th>
-                <th className="text-left px-6 py-3 text-sm font-medium">Category</th>
+                <th className="text-left px-6 py-3 text-sm font-medium">Description</th>
                 <th className="text-right px-6 py-3 text-sm font-medium">Actions</th>
               </tr>
             </thead>
@@ -199,7 +189,7 @@ export default function PoliciesAdmin() {
               {policies.map((policy) => (
                 <tr key={policy.id}>
                   <td className="px-6 py-4">{policy.title}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{policy.category}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600">{policy.description}</td>
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => { setEditingId(policy.id); setFormData(policy); }} className="text-blue-600 hover:text-blue-700 mr-3">
                       <Edit2 className="w-4 h-4" />
