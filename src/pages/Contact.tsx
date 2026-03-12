@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -11,20 +12,51 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const { error } = await supabase.from('contact_messages').insert([
+        {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || null,
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
+        },
+      ]);
+
+      if (error) {
+        setSubmitError(error.message || 'Failed to send message. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
       setShowSuccess(true);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setTimeout(() => setShowSuccess(false), 5000);
 
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 5000);
-    }, 1500);
+      // Fire-and-forget: notify admin by email (Edge Function)
+      supabase.functions
+        .invoke('notify-contact-message', {
+          body: {
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim() || null,
+            subject: formData.subject.trim(),
+            message: formData.message.trim(),
+            created_at: new Date().toISOString(),
+          },
+        })
+        .catch((err) => console.warn('Notify contact message:', err));
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Something went wrong.');
+    }
+    setIsSubmitting(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -106,6 +138,16 @@ export default function Contact() {
                         <h3 className="text-lg font-bold text-green-900 mb-1">Message Sent Successfully!</h3>
                         <p className="text-green-700">We'll get back to you at the earliest.</p>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {submitError && (
+                  <div className="mb-6 p-6 bg-red-50 border-2 border-red-200 rounded-xl flex items-center gap-4">
+                    <AlertCircle className="w-10 h-10 text-red-600 flex-shrink-0" />
+                    <div>
+                      <h3 className="text-lg font-bold text-red-900 mb-1">Could not send message</h3>
+                      <p className="text-red-700">{submitError}</p>
                     </div>
                   </div>
                 )}

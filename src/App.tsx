@@ -23,6 +23,10 @@ import NewsAdmin from './pages/admin/NewsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
 import ClientsAdmin from './pages/admin/ClientsAdmin';
 import SuppliersAdmin from './pages/admin/SuppliersAdmin';
+import HomepageSlidesAdmin from './pages/admin/HomepageSlidesAdmin';
+import SiteSettingsAdmin from './pages/admin/SiteSettingsAdmin';
+import FooterLinksAdmin from './pages/admin/FooterLinksAdmin';
+import ContactMessagesAdmin from './pages/admin/ContactMessagesAdmin';
 
 function App() {
   return (
@@ -37,6 +41,10 @@ function App() {
         <Route path="/admin/policies" element={<ProtectedRoute><PoliciesAdmin /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><ProductsAdmin /></ProtectedRoute>} />
         <Route path="/admin/news" element={<ProtectedRoute><NewsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/homepage-slides" element={<ProtectedRoute><HomepageSlidesAdmin /></ProtectedRoute>} />
+        <Route path="/admin/site-settings" element={<ProtectedRoute><SiteSettingsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/footer-links" element={<ProtectedRoute><FooterLinksAdmin /></ProtectedRoute>} />
+        <Route path="/admin/contact-messages" element={<ProtectedRoute><ContactMessagesAdmin /></ProtectedRoute>} />
         <Route path="/admin/clients" element={<ProtectedRoute><ClientsAdmin /></ProtectedRoute>} />
         <Route path="/admin/suppliers" element={<ProtectedRoute><SuppliersAdmin /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute><UsersAdmin /></ProtectedRoute>} />
