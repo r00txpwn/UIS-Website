@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
+import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText, Image } from 'lucide-react';
 
 interface Accreditation {
   id: string;
@@ -17,6 +17,8 @@ export default function AccreditationsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Accreditation>>({});
   const [loading, setLoading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   useEffect(() => {
     fetchAccreditations();
@@ -28,6 +30,62 @@ export default function AccreditationsAdmin() {
       .select('*')
       .order('display_order');
     if (data) setAccreditations(data);
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingLogo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `logos/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('accreditations')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('accreditations')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, logo_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      alert('Error uploading logo');
+    }
+    setUploadingLogo(false);
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPdf(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `certificates/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('accreditations')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('accreditations')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, certificate_pdf_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading PDF:', error);
+      alert('Error uploading PDF');
+    }
+    setUploadingPdf(false);
   };
 
   const handleSave = async () => {
@@ -107,24 +165,86 @@ export default function AccreditationsAdmin() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Logo URL</label>
-                <input
-                  type="text"
-                  value={formData.logo_url || ''}
-                  onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="/images/cert-logo.svg"
-                />
+                <label className="block text-sm font-medium mb-2">Logo Image</label>
+                <div className="space-y-3">
+                  {formData.logo_url && (
+                    <div className="relative inline-block">
+                      <img
+                        src={formData.logo_url}
+                        alt="Logo preview"
+                        className="h-32 w-auto rounded-lg border-2 border-gray-200 bg-white p-2"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, logo_url: null })}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <label className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                      <Upload className="w-4 h-4" />
+                      {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        disabled={uploadingLogo}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Accepted formats: JPG, PNG, WebP, SVG (Max 10MB)
+                  </p>
+                </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-1">Certificate PDF URL</label>
-                <input
-                  type="text"
-                  value={formData.certificate_pdf_url || ''}
-                  onChange={(e) => setFormData({ ...formData, certificate_pdf_url: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="/certificates/cert.pdf"
-                />
+                <label className="block text-sm font-medium mb-2">Certificate PDF (Optional)</label>
+                <div className="space-y-3">
+                  {formData.certificate_pdf_url && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border">
+                      <FileText className="w-8 h-8 text-red-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Certificate uploaded</p>
+                        <a
+                          href={formData.certificate_pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          View PDF
+                        </a>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, certificate_pdf_url: null })}
+                        className="bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <label className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                      <Upload className="w-4 h-4" />
+                      {uploadingPdf ? 'Uploading...' : 'Upload PDF'}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handlePdfUpload}
+                        className="hidden"
+                        disabled={uploadingPdf}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PDF format only (Max 10MB)
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <button

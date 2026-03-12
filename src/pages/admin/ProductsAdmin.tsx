@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
+import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText, Image } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -18,6 +18,8 @@ export default function ProductsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Product>>({});
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -26,6 +28,62 @@ export default function ProductsAdmin() {
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('display_order');
     if (data) setProducts(data);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image');
+    }
+    setUploadingImage(false);
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPdf(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `specs/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, spec_sheet_pdf_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading PDF:', error);
+      alert('Error uploading PDF');
+    }
+    setUploadingPdf(false);
   };
 
   const handleSave = async () => {
@@ -101,24 +159,86 @@ export default function ProductsAdmin() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Image URL</label>
-                <input
-                  type="text"
-                  value={formData.image_url || ''}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="/images/product.jpg"
-                />
+                <label className="block text-sm font-medium mb-2">Product Image</label>
+                <div className="space-y-3">
+                  {formData.image_url && (
+                    <div className="relative inline-block">
+                      <img
+                        src={formData.image_url}
+                        alt="Product preview"
+                        className="h-32 w-auto rounded-lg border-2 border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, image_url: null })}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <label className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                      <Upload className="w-4 h-4" />
+                      {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Accepted formats: JPG, PNG, WebP, SVG (Max 5MB)
+                  </p>
+                </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-1">Spec Sheet PDF URL</label>
-                <input
-                  type="text"
-                  value={formData.spec_sheet_pdf_url || ''}
-                  onChange={(e) => setFormData({ ...formData, spec_sheet_pdf_url: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="/specs/product-spec.pdf"
-                />
+                <label className="block text-sm font-medium mb-2">Spec Sheet PDF (Optional)</label>
+                <div className="space-y-3">
+                  {formData.spec_sheet_pdf_url && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border">
+                      <FileText className="w-8 h-8 text-red-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Spec sheet uploaded</p>
+                        <a
+                          href={formData.spec_sheet_pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          View PDF
+                        </a>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, spec_sheet_pdf_url: null })}
+                        className="bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <label className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                      <Upload className="w-4 h-4" />
+                      {uploadingPdf ? 'Uploading...' : 'Upload PDF'}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handlePdfUpload}
+                        className="hidden"
+                        disabled={uploadingPdf}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PDF format only (Max 5MB)
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={loading} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">

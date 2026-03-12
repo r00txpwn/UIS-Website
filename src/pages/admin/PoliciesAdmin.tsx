@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
+import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText } from 'lucide-react';
 
 interface Policy {
   id: string;
@@ -17,6 +17,7 @@ export default function PoliciesAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Policy>>({});
   const [loading, setLoading] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   useEffect(() => {
     fetchPolicies();
@@ -25,6 +26,34 @@ export default function PoliciesAdmin() {
   const fetchPolicies = async () => {
     const { data } = await supabase.from('policies').select('*').order('display_order');
     if (data) setPolicies(data);
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPdf(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('policies')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('policies')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, pdf_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading PDF:', error);
+      alert('Error uploading PDF');
+    }
+    setUploadingPdf(false);
   };
 
   const handleSave = async () => {
@@ -91,14 +120,48 @@ export default function PoliciesAdmin() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">PDF URL</label>
-                <input
-                  type="text"
-                  value={formData.pdf_url || ''}
-                  onChange={(e) => setFormData({ ...formData, pdf_url: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="/policies/policy.pdf"
-                />
+                <label className="block text-sm font-medium mb-2">Policy PDF Document</label>
+                <div className="space-y-3">
+                  {formData.pdf_url && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border">
+                      <FileText className="w-8 h-8 text-red-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">PDF uploaded</p>
+                        <a
+                          href={formData.pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          View PDF
+                        </a>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, pdf_url: '' })}
+                        className="bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <label className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                      <Upload className="w-4 h-4" />
+                      {uploadingPdf ? 'Uploading...' : 'Upload PDF'}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handlePdfUpload}
+                        className="hidden"
+                        disabled={uploadingPdf}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PDF format only (Max 10MB)
+                  </p>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
