@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#fee2e2"/>
+  <rect x="120" y="120" width="160" height="60" fill="#ef4444" opacity="0.6"/>
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#7f1d1d" text-anchor="middle">Rig Move Services</text>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#fef3c7"/>
+  <polygon points="200,100 240,180 160,180" fill="#f59e0b" opacity="0.6"/>
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#78350f" text-anchor="middle">Training Solutions</text>
+</svg>

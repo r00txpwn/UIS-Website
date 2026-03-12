@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#cffafe"/>
+  <rect x="160" y="120" width="80" height="60" fill="#06b6d4" opacity="0.6"/>
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#164e63" text-anchor="middle">HR Management</text>
+</svg>
