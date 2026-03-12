@@ -12,8 +12,10 @@ interface Service {
 export default function Header() {
   const location = useLocation();
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function Header() {
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
     setMobileServicesOpen(false);
+    setMobileAboutOpen(false);
   };
 
   return (
@@ -74,21 +77,54 @@ export default function Header() {
             }`}></div>
           </Link>
 
-          <Link
-            to="/about"
-            className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
-              isActive('/about')
-                ? 'text-blue-600 font-semibold'
-                : 'text-gray-700 hover:text-gray-900'
-            }`}
+          <div
+            className="relative"
+            onMouseEnter={() => setAboutOpen(true)}
+            onMouseLeave={() => setAboutOpen(false)}
           >
-            <span className="relative z-10">About</span>
-            <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
-              isActive('/about')
-                ? 'bg-blue-50'
-                : 'bg-gray-50/0 group-hover:bg-gray-50'
-            }`}></div>
-          </Link>
+            <button
+              className={`relative px-4 py-2 rounded-lg transition-all duration-300 group flex items-center gap-1 ${
+                isActive('/about') || isActive('/policies')
+                  ? 'text-blue-600 font-semibold'
+                  : 'text-gray-700 hover:text-gray-900'
+              }`}
+            >
+              <span className="relative z-10">About</span>
+              <ChevronDown className={`w-4 h-4 relative z-10 transition-transform duration-300 ${aboutOpen ? 'rotate-180' : ''}`} />
+              <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
+                isActive('/about') || isActive('/policies')
+                  ? 'bg-blue-50'
+                  : 'bg-gray-50/0 group-hover:bg-gray-50'
+              }`}></div>
+            </button>
+
+            {aboutOpen && (
+              <div className="absolute top-full left-0 pt-3">
+                <div className="w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-3 overflow-hidden">
+                  <Link
+                    to="/about"
+                    className="group flex items-start gap-3 px-5 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-300"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="flex-1">
+                      <div className="font-medium group-hover:text-blue-600 transition-colors">About Us</div>
+                      <div className="text-sm text-gray-500 mt-0.5">Company overview</div>
+                    </div>
+                  </Link>
+                  <Link
+                    to="/policies"
+                    className="group flex items-start gap-3 px-5 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-300"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="flex-1">
+                      <div className="font-medium group-hover:text-blue-600 transition-colors">Our Policies</div>
+                      <div className="text-sm text-gray-500 mt-0.5">Policy documents</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
 
           <Link
             to="/clients"
@@ -228,13 +264,33 @@ export default function Header() {
             >
               Home
             </Link>
-            <Link
-              to="/about"
-              onClick={closeMobileMenu}
-              className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/about') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
-            >
-              About
-            </Link>
+            <div>
+              <button
+                onClick={() => setMobileAboutOpen(!mobileAboutOpen)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${isActive('/about') || isActive('/policies') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
+              >
+                About
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileAboutOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {mobileAboutOpen && (
+                <div className="ml-4 mt-1 space-y-1">
+                  <Link
+                    to="/about"
+                    onClick={closeMobileMenu}
+                    className="block px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
+                  >
+                    About Us
+                  </Link>
+                  <Link
+                    to="/policies"
+                    onClick={closeMobileMenu}
+                    className="block px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
+                  >
+                    Our Policies
+                  </Link>
+                </div>
+              )}
+            </div>
             <Link
               to="/clients"
               onClick={closeMobileMenu}

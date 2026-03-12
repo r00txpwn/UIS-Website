@@ -9,6 +9,7 @@ import Accreditations from './pages/Accreditations';
 import About from './pages/About';
 import BusinessEthics from './pages/BusinessEthics';
 import Contact from './pages/Contact';
+import Policies from './pages/Policies';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/accreditations" element={<Accreditations />} />
                 <Route path="/business-ethics" element={<BusinessEthics />} />
+                <Route path="/policies" element={<Policies />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/services/:slug" element={<ServiceDetail />} />
               </Routes>

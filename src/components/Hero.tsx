@@ -10,7 +10,7 @@ export default function Hero() {
     },
     {
       image: '/images/hero-bg.svg',
-      title: 'Excellence in Industrial Services'
+      title: 'Certified Quality & Safety Standards'
     },
     {
       image: '/images/Screenshot_2.png',
