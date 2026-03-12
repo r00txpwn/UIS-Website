@@ -17,6 +17,8 @@ export default function AccreditationsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Accreditation>>({});
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
 
@@ -25,11 +27,18 @@ export default function AccreditationsAdmin() {
   }, []);
 
   const fetchAccreditations = async () => {
-    const { data } = await supabase
+    setFetchError(null);
+    setFetchLoading(true);
+    const { data, error } = await supabase
       .from('accreditations')
       .select('*')
       .order('display_order');
-    if (data) setAccreditations(data);
+    setFetchLoading(false);
+    if (error) {
+      setFetchError(error.message);
+      return;
+    }
+    setAccreditations(data ?? []);
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -283,6 +292,21 @@ export default function AccreditationsAdmin() {
         )}
 
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          {fetchError && (
+            <div className="p-4 bg-red-50 border-b border-red-200 text-red-800 text-sm">
+              Failed to load: {fetchError}
+              <button
+                type="button"
+                onClick={() => fetchAccreditations()}
+                className="ml-3 underline font-medium"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {fetchLoading ? (
+            <div className="p-8 text-center text-slate-500">Loading accreditations...</div>
+          ) : (
           <table className="w-full">
             <thead className="bg-slate-50 border-b">
               <tr>
@@ -314,6 +338,7 @@ export default function AccreditationsAdmin() {
               ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </AdminLayout>
