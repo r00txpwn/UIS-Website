@@ -48,6 +48,12 @@ export default function UsersAdmin() {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    if (!success) return;
+    const t = setTimeout(() => setSuccess(''), 4000);
+    return () => clearTimeout(t);
+  }, [success]);
+
   const fetchUsers = async () => {
     setUsersError(null);
     setUsersLoading(true);
