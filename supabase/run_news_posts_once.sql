@@ -18,18 +18,22 @@ CREATE TABLE IF NOT EXISTS news_posts (
 
 ALTER TABLE news_posts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone can view news_posts" ON news_posts;
 CREATE POLICY "Anyone can view news_posts"
   ON news_posts FOR SELECT TO authenticated, anon
   USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert news_posts" ON news_posts;
 CREATE POLICY "Authenticated users can insert news_posts"
   ON news_posts FOR INSERT TO authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Authenticated users can update news_posts" ON news_posts;
 CREATE POLICY "Authenticated users can update news_posts"
   ON news_posts FOR UPDATE TO authenticated
   USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Authenticated users can delete news_posts" ON news_posts;
 CREATE POLICY "Authenticated users can delete news_posts"
   ON news_posts FOR DELETE TO authenticated
   USING (true);
