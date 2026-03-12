@@ -22,6 +22,8 @@ export default function ClientsAdmin() {
     logo_url: '',
     display_order: 0
   });
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchClients();
@@ -112,6 +114,7 @@ export default function ClientsAdmin() {
 
   const resetForm = () => {
     setFormData({ name: '', logo_url: '', display_order: 0 });
+    setUploadError(null);
     setEditingId(null);
     setShowAddForm(false);
   };
@@ -120,16 +123,20 @@ export default function ClientsAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    setUploadError(null);
+    setUploadingLogo(true);
+
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
     const filePath = `clients/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('images')
-      .upload(filePath, file);
+      .upload(filePath, file, { upsert: false });
 
     if (uploadError) {
-      console.error('Error uploading image:', uploadError);
+      setUploadError(uploadError.message);
+      setUploadingLogo(false);
       return;
     }
 
@@ -137,7 +144,9 @@ export default function ClientsAdmin() {
       .from('images')
       .getPublicUrl(filePath);
 
-    setFormData({ ...formData, logo_url: publicUrl });
+    setFormData((prev) => ({ ...prev, logo_url: publicUrl }));
+    setUploadingLogo(false);
+    e.target.value = '';
   };
 
   return (
@@ -182,28 +191,40 @@ export default function ClientsAdmin() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Logo URL
+                  Logo
                 </label>
                 <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={formData.logo_url}
-                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                    placeholder="https://example.com/logo.png or upload below"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition">
-                      <Upload className="w-4 h-4" />
-                      Upload Image
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
+                  {formData.logo_url && (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={formData.logo_url}
+                        alt="Logo preview"
+                        className="h-16 w-auto object-contain border border-slate-200 rounded-lg p-1 bg-white"
                       />
-                    </label>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, logo_url: '' }))}
+                        className="text-slate-500 hover:text-red-600 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                  <label className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition w-fit">
+                    <Upload className="w-4 h-4" />
+                    {uploadingLogo ? 'Uploading...' : 'Upload logo'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingLogo}
+                    />
+                  </label>
+                  {uploadError && (
+                    <p className="text-sm text-red-600">{uploadError}</p>
+                  )}
+                  <p className="text-xs text-slate-500">JPG, PNG or WebP. Logo is saved to storage.</p>
                 </div>
               </div>
 
@@ -214,7 +235,7 @@ export default function ClientsAdmin() {
                 <input
                   type="number"
                   value={formData.display_order}
-                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, display_order: Number(e.target.value) || 0 })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
