@@ -26,17 +26,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/login');
+      } else {
+        setUserEmail(user.email || '');
+      }
+    };
     checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate('/login');
-    } else {
-      setUserEmail(user.email || '');
-    }
-  };
+  }, [navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
