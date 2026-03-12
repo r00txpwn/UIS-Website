@@ -96,3 +96,4 @@ export default function PolicyPdfPreview({ pdfUrl, title, className = '', maxWid
   }
 
   return null;
+}
