@@ -20,6 +20,9 @@ export default function ProductsAdmin() {
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
 
   useEffect(() => {
     fetchProducts();
@@ -27,7 +30,20 @@ export default function ProductsAdmin() {
 
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('display_order');
-    if (data) setProducts(data);
+    if (data) {
+      setProducts(data);
+      const uniqueCategories = [...new Set(data.map(p => p.category))].filter(Boolean);
+      setCategories(uniqueCategories);
+    }
+  };
+
+  const handleAddNewCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      setCategories([...categories, newCategory.trim()]);
+      setFormData({ ...formData, category: newCategory.trim() });
+      setNewCategory('');
+      setShowNewCategoryInput(false);
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,12 +167,59 @@ export default function ProductsAdmin() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
-                <input
-                  type="text"
-                  value={formData.category || ''}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                />
+                {!showNewCategoryInput ? (
+                  <div className="space-y-2">
+                    <select
+                      value={formData.category || ''}
+                      onChange={(e) => {
+                        if (e.target.value === '__new__') {
+                          setShowNewCategoryInput(true);
+                        } else {
+                          setFormData({ ...formData, category: e.target.value });
+                        }
+                      }}
+                      className="w-full border rounded-lg px-3 py-2"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__new__">+ Create New Category</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                        placeholder="Enter new category name"
+                        className="flex-1 border rounded-lg px-3 py-2"
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddNewCategory()}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddNewCategory}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                      >
+                        Add
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowNewCategoryInput(false);
+                          setNewCategory('');
+                        }}
+                        className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Product Image</label>
