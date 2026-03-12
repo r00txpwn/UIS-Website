@@ -1,43 +1,35 @@
+import { useEffect, useState } from 'react';
 import Section from '../components/Section';
+import { supabase } from '../lib/supabase';
+
+interface Client {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
 
 export default function Clients() {
-  const clients = [
-    { name: 'BP', logo: 'https://logo.clearbit.com/bp.com' },
-    { name: 'SOCAR Fugro', logo: 'https://logo.clearbit.com/socar.az' },
-    { name: 'Caspian Marine Services', logo: '' },
-    { name: 'Franks/Expro', logo: 'https://logo.clearbit.com/expro.com' },
-    { name: 'Saipem', logo: 'https://logo.clearbit.com/saipem.com' },
-    { name: 'Prokon', logo: '' },
-    { name: 'Azerbaijan Shipping Company', logo: '' },
-    { name: 'Atlas Engineering', logo: '' },
-    { name: 'Bos Shelf', logo: '' },
-    { name: 'Subsea7', logo: 'https://logo.clearbit.com/subsea7.com' },
-    { name: 'JOCAP', logo: '' },
-    { name: 'Transmarine Shipping', logo: '' },
-    { name: 'P&O Maritime', logo: '' },
-    { name: 'PD&MS', logo: '' },
-    { name: 'Pioneer Engineering', logo: '' },
-    { name: 'Wood Group', logo: 'https://logo.clearbit.com/woodplc.com' },
-    { name: 'Baku Shipyard', logo: '' },
-    { name: 'SOCAR DALGIDJ', logo: 'https://logo.clearbit.com/socar.az' },
-    { name: 'HOLCIM AZERBAIJAN OJSC', logo: 'https://logo.clearbit.com/holcim.com' },
-    { name: 'Turan Drilling', logo: '' },
-    { name: 'Azfen', logo: '' },
-    { name: 'Maersk Drilling', logo: 'https://logo.clearbit.com/maerskdrilling.com' },
-    { name: 'AZ Logistics', logo: '' },
-    { name: 'Silkway', logo: '' },
-    { name: 'SDL Nobel LLC', logo: '' },
-    { name: 'Khazar Fabrication', logo: '' },
-    { name: 'Baku Steel Company', logo: '' },
-    { name: 'Caspian Shipyard', logo: '' },
-    { name: 'Shinkar MMC', logo: '' },
-    { name: 'AAS ATE', logo: '' },
-    { name: 'Caspian Drilling Company', logo: '' },
-    { name: 'Bahar Energy', logo: '' },
-    { name: 'ATLAS CORP LLC', logo: '' },
-    { name: 'AAS Ekol LLC', logo: '' },
-    { name: 'Caspian Pipe Coatings', logo: '' }
-  ];
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*')
+      .order('display_order', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching clients:', error);
+    } else {
+      setClients(data || []);
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -51,45 +43,57 @@ export default function Clients() {
       </div>
 
       <Section title="">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
-          {clients.map((client, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-center p-6 bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 group"
-            >
-              <div className="text-center">
-                <div className="relative h-16 flex items-center justify-center">
-                  {client.logo ? (
-                    <img
-                      src={client.logo}
-                      alt={`${client.name} logo`}
-                      className="h-16 w-auto mx-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          const fallback = document.createElement('div');
-                          fallback.className = 'text-sm font-semibold text-gray-700 px-2';
-                          fallback.textContent = client.name;
-                          parent.appendChild(fallback);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="text-sm font-semibold text-gray-700 px-2">
-                      {client.name}
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-slate-500">Loading clients...</p>
+          </div>
+        ) : clients.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-slate-500">No clients available at the moment.</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
+              {clients.map((client) => (
+                <div
+                  key={client.id}
+                  className="flex items-center justify-center p-6 bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 group"
+                >
+                  <div className="text-center">
+                    <div className="relative h-16 flex items-center justify-center">
+                      {client.logo_url ? (
+                        <img
+                          src={client.logo_url}
+                          alt={`${client.name} logo`}
+                          className="h-16 w-auto mx-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const fallback = document.createElement('div');
+                              fallback.className = 'text-sm font-semibold text-gray-700 px-2';
+                              fallback.textContent = client.name;
+                              parent.appendChild(fallback);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="text-sm font-semibold text-gray-700 px-2">
+                          {client.name}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-gray-600 text-lg">...and many more</p>
-        </div>
+            <div className="mt-12 text-center">
+              <p className="text-gray-600 text-lg">...and many more</p>
+            </div>
+          </>
+        )}
       </Section>
     </div>
   );

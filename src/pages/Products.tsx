@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { FileText, ChevronRight } from 'lucide-react';
 
+interface Supplier {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -9,6 +15,8 @@ interface Product {
   category: string;
   image_url: string | null;
   spec_sheet_pdf_url: string | null;
+  supplier_id: string | null;
+  supplier?: Supplier;
 }
 
 export default function Products() {
@@ -24,7 +32,10 @@ export default function Products() {
     setLoading(true);
     const { data } = await supabase
       .from('products')
-      .select('*')
+      .select(`
+        *,
+        supplier:suppliers(id, name, logo_url)
+      `)
       .order('display_order');
 
     if (data) setProducts(data);
@@ -108,6 +119,25 @@ export default function Products() {
                   <p className="text-gray-600 mb-4 line-clamp-3">
                     {product.description}
                   </p>
+
+                  {product.supplier && (
+                    <div className="mb-4 pb-4 border-b border-gray-200">
+                      <p className="text-xs text-gray-500 mb-2">Supplied by</p>
+                      <div className="flex items-center gap-3">
+                        {product.supplier.logo_url ? (
+                          <img
+                            src={product.supplier.logo_url}
+                            alt={product.supplier.name}
+                            className="h-8 w-auto object-contain"
+                          />
+                        ) : (
+                          <span className="text-sm font-semibold text-gray-700">
+                            {product.supplier.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {product.spec_sheet_pdf_url && (
                     <a

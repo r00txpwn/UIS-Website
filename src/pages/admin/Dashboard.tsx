@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { FileText, Award, FileCheck, Package } from 'lucide-react';
+import { FileText, Award, FileCheck, Package, Users, Boxes } from 'lucide-react';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
     services: 0,
     accreditations: 0,
     policies: 0,
-    products: 0
+    products: 0,
+    clients: 0,
+    suppliers: 0
   });
 
   useEffect(() => {
@@ -16,18 +18,22 @@ export default function Dashboard() {
   }, []);
 
   const fetchStats = async () => {
-    const [services, accreditations, policies, products] = await Promise.all([
+    const [services, accreditations, policies, products, clients, suppliers] = await Promise.all([
       supabase.from('services').select('id', { count: 'exact', head: true }),
       supabase.from('accreditations').select('id', { count: 'exact', head: true }),
       supabase.from('policies').select('id', { count: 'exact', head: true }),
-      supabase.from('products').select('id', { count: 'exact', head: true })
+      supabase.from('products').select('id', { count: 'exact', head: true }),
+      supabase.from('clients').select('id', { count: 'exact', head: true }),
+      supabase.from('suppliers').select('id', { count: 'exact', head: true })
     ]);
 
     setStats({
       services: services.count || 0,
       accreditations: accreditations.count || 0,
       policies: policies.count || 0,
-      products: products.count || 0
+      products: products.count || 0,
+      clients: clients.count || 0,
+      suppliers: suppliers.count || 0
     });
   };
 
@@ -35,7 +41,9 @@ export default function Dashboard() {
     { label: 'Services', value: stats.services, icon: FileText, color: 'bg-blue-500' },
     { label: 'Accreditations', value: stats.accreditations, icon: Award, color: 'bg-green-500' },
     { label: 'Policies', value: stats.policies, icon: FileCheck, color: 'bg-orange-500' },
-    { label: 'Products', value: stats.products, icon: Package, color: 'bg-purple-500' }
+    { label: 'Products', value: stats.products, icon: Package, color: 'bg-red-500' },
+    { label: 'Clients', value: stats.clients, icon: Users, color: 'bg-teal-500' },
+    { label: 'Suppliers', value: stats.suppliers, icon: Boxes, color: 'bg-amber-500' }
   ];
 
   return (
@@ -46,7 +54,7 @@ export default function Dashboard() {
           <p className="text-slate-600 mt-2">Manage your website content from this dashboard</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -102,10 +110,30 @@ export default function Dashboard() {
               href="/admin/products"
               className="flex items-center gap-3 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
             >
-              <Package className="w-5 h-5 text-purple-600" />
+              <Package className="w-5 h-5 text-red-600" />
               <div>
                 <p className="font-medium text-slate-900">Manage Products</p>
                 <p className="text-sm text-slate-600">Add or edit products</p>
+              </div>
+            </a>
+            <a
+              href="/admin/clients"
+              className="flex items-center gap-3 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+            >
+              <Users className="w-5 h-5 text-teal-600" />
+              <div>
+                <p className="font-medium text-slate-900">Manage Clients</p>
+                <p className="text-sm text-slate-600">Add or edit client logos</p>
+              </div>
+            </a>
+            <a
+              href="/admin/suppliers"
+              className="flex items-center gap-3 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+            >
+              <Boxes className="w-5 h-5 text-amber-600" />
+              <div>
+                <p className="font-medium text-slate-900">Manage Suppliers</p>
+                <p className="text-sm text-slate-600">Add or edit supplier logos</p>
               </div>
             </a>
           </div>

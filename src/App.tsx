@@ -17,6 +17,8 @@ import AccreditationsAdmin from './pages/admin/AccreditationsAdmin';
 import PoliciesAdmin from './pages/admin/PoliciesAdmin';
 import ProductsAdmin from './pages/admin/ProductsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
+import ClientsAdmin from './pages/admin/ClientsAdmin';
+import SuppliersAdmin from './pages/admin/SuppliersAdmin';
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
         <Route path="/admin/accreditations" element={<ProtectedRoute><AccreditationsAdmin /></ProtectedRoute>} />
         <Route path="/admin/policies" element={<ProtectedRoute><PoliciesAdmin /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><ProductsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/clients" element={<ProtectedRoute><ClientsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/suppliers" element={<ProtectedRoute><SuppliersAdmin /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute><UsersAdmin /></ProtectedRoute>} />
 
         {/* Public Routes */}

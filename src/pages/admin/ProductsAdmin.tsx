@@ -11,10 +11,18 @@ interface Product {
   image_url: string | null;
   spec_sheet_pdf_url: string | null;
   display_order: number;
+  supplier_id: string | null;
+}
+
+interface Supplier {
+  id: string;
+  name: string;
+  logo_url: string | null;
 }
 
 export default function ProductsAdmin() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Product>>({});
   const [loading, setLoading] = useState(false);
@@ -26,6 +34,7 @@ export default function ProductsAdmin() {
 
   useEffect(() => {
     fetchProducts();
+    fetchSuppliers();
   }, []);
 
   const fetchProducts = async () => {
@@ -34,6 +43,16 @@ export default function ProductsAdmin() {
       setProducts(data);
       const uniqueCategories = [...new Set(data.map(p => p.category))].filter(Boolean);
       setCategories(uniqueCategories);
+    }
+  };
+
+  const fetchSuppliers = async () => {
+    const { data } = await supabase
+      .from('suppliers')
+      .select('id, name, logo_url')
+      .order('name');
+    if (data) {
+      setSuppliers(data);
     }
   };
 
@@ -230,6 +249,24 @@ export default function ProductsAdmin() {
                     </div>
                   </div>
                 )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Supplier (Optional)</label>
+                <select
+                  value={formData.supplier_id || ''}
+                  onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value || null })}
+                  className="w-full border rounded-lg px-3 py-2"
+                >
+                  <option value="">No supplier</option>
+                  {suppliers.map((supplier) => (
+                    <option key={supplier.id} value={supplier.id}>
+                      {supplier.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select a supplier to display their logo with this product
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Product Image</label>
