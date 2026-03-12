@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { FileText } from 'lucide-react';
 
@@ -13,7 +13,7 @@ interface PolicyPdfPreviewProps {
 }
 
 export default function PolicyPdfPreview({ pdfUrl, title, className = '', maxWidth = 400 }: PolicyPdfPreviewProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -35,20 +35,26 @@ export default function PolicyPdfPreview({ pdfUrl, title, className = '', maxWid
         const page = await pdf.getPage(1);
         if (cancelled) return;
 
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
         const baseViewport = page.getViewport({ scale: 1 });
         const scale = maxWidth / baseViewport.width;
         const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
         canvas.width = viewport.width;
         canvas.height = viewport.height;
 
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+          if (!cancelled) setError(true);
+          return;
+        }
 
         await page.render({ canvasContext: ctx, viewport }).promise;
-        if (!cancelled) setError(false);
+        if (cancelled) return;
+
+        const dataUrl = canvas.toDataURL('image/png');
+        setPreviewDataUrl(dataUrl);
+        setError(false);
       } catch {
         if (!cancelled) setError(true);
       } finally {
@@ -76,13 +82,17 @@ export default function PolicyPdfPreview({ pdfUrl, title, className = '', maxWid
     );
   }
 
-  return (
-    <div className={`overflow-hidden bg-slate-100 ${className}`}>
-      <canvas
-        ref={canvasRef}
-        className="w-full h-auto block"
-        style={{ maxWidth: '100%' }}
-      />
-    </div>
-  );
-}
+  if (previewDataUrl) {
+    return (
+      <div className={`overflow-hidden bg-slate-100 ${className}`}>
+        <img
+          src={previewDataUrl}
+          alt={`Preview: ${title}`}
+          className="w-full h-auto block"
+          style={{ maxWidth: '100%' }}
+        />
+      </div>
+    );
+  }
+
+  return null;
