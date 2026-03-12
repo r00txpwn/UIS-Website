@@ -47,6 +47,11 @@ export default function Footer() {
                   Business Ethics
                 </Link>
               </li>
+              <li>
+                <Link to="/news" className="text-sm hover:text-white transition-colors">
+                  News and Events
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   Building2,
-  Truck
+  Truck,
+  Newspaper
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -48,6 +49,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/accreditations', icon: Award, label: 'Accreditations' },
     { path: '/admin/policies', icon: FileCheck, label: 'Policies' },
     { path: '/admin/products', icon: Package, label: 'Products' },
+    { path: '/admin/news', icon: Newspaper, label: 'News and Events' },
     { path: '/admin/clients', icon: Building2, label: 'Clients' },
     { path: '/admin/suppliers', icon: Truck, label: 'Suppliers' },
     { path: '/admin/users', icon: Users, label: 'Users' },
