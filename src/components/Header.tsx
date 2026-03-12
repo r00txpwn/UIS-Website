@@ -40,6 +40,10 @@ export default function Header() {
     return location.pathname.startsWith('/services');
   };
 
+  const isNewsActive = () => {
+    return location.pathname.startsWith('/news');
+  };
+
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
     setMobileServicesOpen(false);
@@ -233,6 +237,22 @@ export default function Header() {
           </Link>
 
           <Link
+            to="/news"
+            className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
+              isNewsActive()
+                ? 'text-blue-600 font-semibold'
+                : 'text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            <span className="relative z-10">News and Events</span>
+            <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
+              isNewsActive()
+                ? 'bg-blue-50'
+                : 'bg-gray-50/0 group-hover:bg-gray-50'
+            }`}></div>
+          </Link>
+
+          <Link
             to="/contact"
             className="relative px-4 py-2 ml-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/30 hover:-translate-y-0.5 font-medium"
           >
@@ -343,6 +363,13 @@ export default function Header() {
               className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/business-ethics') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
             >
               Business Ethics
+            </Link>
+            <Link
+              to="/news"
+              onClick={closeMobileMenu}
+              className={`block px-4 py-3 rounded-lg transition-colors ${isNewsActive() ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
+              News and Events
             </Link>
             <Link
               to="/contact"

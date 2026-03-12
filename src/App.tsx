@@ -10,6 +10,8 @@ import About from './pages/About';
 import BusinessEthics from './pages/BusinessEthics';
 import Contact from './pages/Contact';
 import Policies from './pages/Policies';
+import News from './pages/News';
+import NewsPostDetail from './pages/NewsPostDetail';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
@@ -17,6 +19,7 @@ import ServicesAdmin from './pages/admin/ServicesAdmin';
 import AccreditationsAdmin from './pages/admin/AccreditationsAdmin';
 import PoliciesAdmin from './pages/admin/PoliciesAdmin';
 import ProductsAdmin from './pages/admin/ProductsAdmin';
+import NewsAdmin from './pages/admin/NewsAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
 import ClientsAdmin from './pages/admin/ClientsAdmin';
 import SuppliersAdmin from './pages/admin/SuppliersAdmin';
@@ -33,6 +36,7 @@ function App() {
         <Route path="/admin/accreditations" element={<ProtectedRoute><AccreditationsAdmin /></ProtectedRoute>} />
         <Route path="/admin/policies" element={<ProtectedRoute><PoliciesAdmin /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><ProductsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/news" element={<ProtectedRoute><NewsAdmin /></ProtectedRoute>} />
         <Route path="/admin/clients" element={<ProtectedRoute><ClientsAdmin /></ProtectedRoute>} />
         <Route path="/admin/suppliers" element={<ProtectedRoute><SuppliersAdmin /></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute><UsersAdmin /></ProtectedRoute>} />
@@ -51,6 +55,8 @@ function App() {
                 <Route path="/business-ethics" element={<BusinessEthics />} />
                 <Route path="/policies" element={<Policies />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:slug" element={<NewsPostDetail />} />
                 <Route path="/services/:slug" element={<ServiceDetail />} />
               </Routes>
             </main>
