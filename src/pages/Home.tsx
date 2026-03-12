@@ -34,6 +34,9 @@ export default function Home() {
         .limit(8);
 
       if (data) setServices(data);
+      // #region agent log
+      fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'Home.tsx:fetchServices',message:'Home services fetch',data:{count:data?.length??0,hasError:false},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
     };
 
     const fetchAccreditations = async () => {
@@ -44,6 +47,9 @@ export default function Home() {
         .limit(4);
 
       if (data) setFeaturedAccreditations(data);
+      // #region agent log
+      fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'Home.tsx:fetchAccreditations',message:'Home accreditations fetch',data:{count:data?.length??0,hasError:false},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
     };
 
     fetchServices();

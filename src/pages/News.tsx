@@ -28,7 +28,7 @@ export default function News() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('news_posts')
         .select('id, title, slug, excerpt, image_url, published_at')
         .eq('published', true)
@@ -36,6 +36,9 @@ export default function News() {
 
       if (data) setPosts(data);
       setLoading(false);
+      // #region agent log
+      fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'News.tsx:fetchPosts',message:'News list fetch',data:{count:data?.length??0,error:error?.message??null},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
     };
 
     fetchPosts();
