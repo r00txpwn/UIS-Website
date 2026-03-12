@@ -58,16 +58,26 @@ export default function PoliciesAdmin() {
   const handleSave = async () => {
     setLoading(true);
     try {
+      let result;
       if (editingId === 'new') {
-        await supabase.from('policies').insert([formData]);
+        result = await supabase.from('policies').insert([formData]);
       } else if (editingId) {
-        await supabase.from('policies').update(formData).eq('id', editingId);
+        result = await supabase.from('policies').update(formData).eq('id', editingId);
       }
+
+      if (result?.error) {
+        console.error('Error saving:', result.error);
+        alert(`Error saving: ${result.error.message}`);
+        setLoading(false);
+        return;
+      }
+
       await fetchPolicies();
       setEditingId(null);
       setFormData({});
     } catch (error) {
       console.error('Error saving:', error);
+      alert(`Error: ${error}`);
     }
     setLoading(false);
   };

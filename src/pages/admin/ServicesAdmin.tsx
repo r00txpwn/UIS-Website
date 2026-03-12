@@ -64,16 +64,26 @@ export default function ServicesAdmin() {
   const handleSave = async () => {
     setLoading(true);
     try {
+      let result;
       if (editingId === 'new') {
-        await supabase.from('services').insert([formData]);
+        result = await supabase.from('services').insert([formData]);
       } else if (editingId) {
-        await supabase.from('services').update(formData).eq('id', editingId);
+        result = await supabase.from('services').update(formData).eq('id', editingId);
       }
+
+      if (result?.error) {
+        console.error('Error saving:', result.error);
+        alert(`Error saving: ${result.error.message}`);
+        setLoading(false);
+        return;
+      }
+
       await fetchServices();
       setEditingId(null);
       setFormData({});
     } catch (error) {
       console.error('Error saving:', error);
+      alert(`Error: ${error}`);
     }
     setLoading(false);
   };
