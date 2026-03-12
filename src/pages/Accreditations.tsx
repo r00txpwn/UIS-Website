@@ -1,43 +1,29 @@
+import { useState, useEffect } from 'react';
 import { Award, CheckCircle, Shield } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+
+interface Accreditation {
+  name: string;
+  logo_url: string;
+  description: string;
+  certificate_pdf_url?: string;
+}
 
 export default function Accreditations() {
-  const accreditations = [
-    {
-      name: 'ISO 14001:2015',
-      image: '/images/cert-iso-140001.png',
-      description: 'Environmental Management System'
-    },
-    {
-      name: 'DDLA - Azerbaijan State Marine Certification',
-      image: '/images/deniz-liman-agentliyi-1.png',
-      description: 'State Marine Authority'
-    },
-    {
-      name: 'ISO 9001:2015',
-      image: '/images/ISO-9001-2015-DQS-Stamp.jpg',
-      description: 'Quality Management System'
-    },
-    {
-      name: 'RMRS NDT',
-      image: '/images/RS-Logo-P307-ENG.jpg',
-      description: 'Non-Destructive Testing'
-    },
-    {
-      name: 'ISO 45001',
-      image: '/images/iso-45001-e-ohs-management-wfsduhygvzdd.jpg',
-      description: 'Occupational Health & Safety'
-    },
-    {
-      name: 'RMRS Lifting',
-      image: '/images/RS-Logo-P307-ENG.jpg',
-      description: 'Lifting Equipment Certification'
-    },
-    {
-      name: 'LEEA Certificate',
-      image: '/images/AMA_LEEA-Colour-Logo-Large copy.jpg',
-      description: 'Lifting Equipment Engineers'
-    }
-  ];
+  const [accreditations, setAccreditations] = useState<Accreditation[]>([]);
+
+  useEffect(() => {
+    const fetchAccreditations = async () => {
+      const { data } = await supabase
+        .from('accreditations')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (data) setAccreditations(data);
+    };
+
+    fetchAccreditations();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -125,7 +111,7 @@ export default function Accreditations() {
               <div className="relative">
                 <div className="aspect-square flex items-center justify-center p-10 bg-gradient-to-br from-gray-50 to-white">
                   <img
-                    src={accreditation.image}
+                    src={accreditation.logo_url}
                     alt={accreditation.name}
                     className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
                     onError={(e) => {
@@ -145,6 +131,16 @@ export default function Accreditations() {
                 <p className="text-sm text-gray-600 text-center">
                   {accreditation.description}
                 </p>
+                {accreditation.certificate_pdf_url && (
+                  <a
+                    href={accreditation.certificate_pdf_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 block text-center text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  >
+                    View Certificate →
+                  </a>
+                )}
               </div>
             </div>
           ))}

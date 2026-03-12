@@ -1,12 +1,34 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, X, Menu } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+
+interface Service {
+  title: string;
+  slug: string;
+  description: string;
+}
 
 export default function Header() {
   const location = useLocation();
   const [servicesOpen, setServicesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      const { data } = await supabase
+        .from('services')
+        .select('title, slug, description')
+        .eq('published', true)
+        .order('display_order', { ascending: true });
+
+      if (data) setServices(data);
+    };
+
+    fetchServices();
+  }, []);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -107,27 +129,20 @@ export default function Header() {
 
             {servicesOpen && (
               <div className="absolute top-full left-0 pt-3">
-                <div className="w-80 bg-white rounded-xl shadow-xl border border-gray-100 py-3 overflow-hidden">
-                  <Link
-                    to="/services/fleet-management"
-                    className="group flex items-start gap-3 px-5 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-300"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="flex-1">
-                      <div className="font-medium group-hover:text-blue-600 transition-colors">Fleet Management</div>
-                      <div className="text-sm text-gray-500 mt-0.5">Comprehensive fleet solutions</div>
-                    </div>
-                  </Link>
-                  <Link
-                    to="/services/ndt-inspection"
-                    className="group flex items-start gap-3 px-5 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-300"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="flex-1">
-                      <div className="font-medium group-hover:text-blue-600 transition-colors">NDT Inspection, Testing & Certification</div>
-                      <div className="text-sm text-gray-500 mt-0.5">Professional testing services</div>
-                    </div>
-                  </Link>
+                <div className="w-80 bg-white rounded-xl shadow-xl border border-gray-100 py-3 overflow-hidden max-h-96 overflow-y-auto">
+                  {services.map((service, index) => (
+                    <Link
+                      key={index}
+                      to={`/services/${service.slug}`}
+                      className="group flex items-start gap-3 px-5 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-300"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-blue-600 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="flex-1">
+                        <div className="font-medium group-hover:text-blue-600 transition-colors">{service.title}</div>
+                        <div className="text-sm text-gray-500 mt-0.5">{service.description}</div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
@@ -222,20 +237,16 @@ export default function Header() {
               </button>
               {mobileServicesOpen && (
                 <div className="ml-4 mt-1 space-y-1">
-                  <Link
-                    to="/services/fleet-management"
-                    onClick={closeMobileMenu}
-                    className="block px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
-                  >
-                    Fleet Management
-                  </Link>
-                  <Link
-                    to="/services/ndt-inspection"
-                    onClick={closeMobileMenu}
-                    className="block px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
-                  >
-                    NDT Inspection, Testing & Certification
-                  </Link>
+                  {services.map((service, index) => (
+                    <Link
+                      key={index}
+                      to={`/services/${service.slug}`}
+                      onClick={closeMobileMenu}
+                      className="block px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
+                    >
+                      {service.title}
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>

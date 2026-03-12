@@ -1,54 +1,54 @@
-import { Building2, ClipboardCheck, Anchor, Users, TrendingUp, Settings, Gauge, UserCheck, Award, Shield, CheckCircle, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Award, Shield, CheckCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import ServiceCard from '../components/ServiceCard';
 import Section from '../components/Section';
 import ClientSlider from '../components/ClientSlider';
 import PartnerSlider from '../components/PartnerSlider';
+import { supabase } from '../lib/supabase';
+
+interface Service {
+  title: string;
+  description: string;
+  image_url: string;
+  slug: string;
+}
+
+interface Accreditation {
+  name: string;
+  logo_url: string;
+}
 
 export default function Home() {
-  const services = [
-    {
-      title: 'Rope Access Solutions',
-      description: 'Read More',
-      image: '/images/files_8280743-1764243500028-files_8280743-1764243185940-image.png'
-    },
-    {
-      title: 'Facilities Management',
-      description: 'Read More',
-      image: '/images/facilities-management.png'
-    },
-    {
-      title: 'Training & Consultancy Solutions',
-      description: 'Read More',
-      image: '/images/training-consultancy.png'
-    },
-    {
-      title: 'Maintenance & Repairs',
-      description: 'Read More',
-      image: '/images/service-4.png'
-    },
-    {
-      title: 'Rig Move Services',
-      description: 'Read More',
-      image: '/images/service-5.jpg'
-    },
-    {
-      title: 'Rental Solutions',
-      description: 'Read More',
-      image: '/images/service-6.jpg'
-    },
-    {
-      title: 'Tank Calibration and Survey',
-      description: 'Read More',
-      image: '/images/service-7.jpg'
-    },
-    {
-      title: 'Human Resources Management',
-      description: 'Read More',
-      image: '/images/service-8.jpg'
-    }
-  ];
+  const [services, setServices] = useState<Service[]>([]);
+  const [featuredAccreditations, setFeaturedAccreditations] = useState<Accreditation[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      const { data } = await supabase
+        .from('services')
+        .select('title, description, image_url, slug')
+        .eq('published', true)
+        .order('display_order', { ascending: true })
+        .limit(8);
+
+      if (data) setServices(data);
+    };
+
+    const fetchAccreditations = async () => {
+      const { data } = await supabase
+        .from('accreditations')
+        .select('name, logo_url')
+        .order('display_order', { ascending: true })
+        .limit(4);
+
+      if (data) setFeaturedAccreditations(data);
+    };
+
+    fetchServices();
+    fetchAccreditations();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -57,7 +57,13 @@ export default function Home() {
       <Section title="Services we offer">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <ServiceCard key={index} {...service} />
+            <Link key={index} to={`/services/${service.slug}`}>
+              <ServiceCard
+                title={service.title}
+                description="Read More"
+                image={service.image_url}
+              />
+            </Link>
           ))}
         </div>
       </Section>
@@ -109,34 +115,15 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-4 gap-6 mb-10">
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10 flex items-center justify-center">
-              <img
-                src="/images/ISO-9001-2015-DQS-Stamp.jpg"
-                alt="ISO 9001:2015"
-                className="max-h-24 object-contain opacity-90 hover:opacity-100 transition-opacity"
-              />
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10 flex items-center justify-center">
-              <img
-                src="/images/cert-iso-140001.png"
-                alt="ISO 14001:2015"
-                className="max-h-24 object-contain opacity-90 hover:opacity-100 transition-opacity"
-              />
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10 flex items-center justify-center">
-              <img
-                src="/images/iso-45001-e-ohs-management-wfsduhygvzdd.jpg"
-                alt="ISO 45001"
-                className="max-h-24 object-contain opacity-90 hover:opacity-100 transition-opacity"
-              />
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10 flex items-center justify-center">
-              <img
-                src="/images/AMA_LEEA-Colour-Logo-Large copy.jpg"
-                alt="LEEA"
-                className="max-h-24 object-contain opacity-90 hover:opacity-100 transition-opacity"
-              />
-            </div>
+            {featuredAccreditations.map((accreditation, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10 flex items-center justify-center">
+                <img
+                  src={accreditation.logo_url}
+                  alt={accreditation.name}
+                  className="max-h-24 object-contain opacity-90 hover:opacity-100 transition-opacity"
+                />
+              </div>
+            ))}
           </div>
 
           <div className="text-center">

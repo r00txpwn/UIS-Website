@@ -3,8 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Clients from './pages/Clients';
-import FleetManagement from './pages/FleetManagement';
-import NDTInspection from './pages/NDTInspection';
+import ServiceDetail from './pages/ServiceDetail';
 import Accreditations from './pages/Accreditations';
 import About from './pages/About';
 import BusinessEthics from './pages/BusinessEthics';
@@ -44,8 +43,7 @@ function App() {
                 <Route path="/accreditations" element={<Accreditations />} />
                 <Route path="/business-ethics" element={<BusinessEthics />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/services/fleet-management" element={<FleetManagement />} />
-                <Route path="/services/ndt-inspection" element={<NDTInspection />} />
+                <Route path="/services/:slug" element={<ServiceDetail />} />
               </Routes>
             </main>
             <Footer />
