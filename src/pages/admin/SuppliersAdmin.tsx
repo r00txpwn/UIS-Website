@@ -58,6 +58,7 @@ export default function SuppliersAdmin() {
 
       if (error) {
         console.error('Error updating supplier:', error);
+        alert(`Error saving: ${error.message}`);
       } else {
         setEditingId(null);
         resetForm();
@@ -74,6 +75,7 @@ export default function SuppliersAdmin() {
 
       if (error) {
         console.error('Error creating supplier:', error);
+        alert(`Error saving: ${error.message}`);
       } else {
         setShowAddForm(false);
         resetForm();
@@ -102,6 +104,7 @@ export default function SuppliersAdmin() {
 
     if (error) {
       console.error('Error deleting supplier:', error);
+      alert(`Error deleting: ${error.message}`);
     } else {
       fetchSuppliers();
     }

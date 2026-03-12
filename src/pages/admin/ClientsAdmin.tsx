@@ -58,6 +58,7 @@ export default function ClientsAdmin() {
 
       if (error) {
         console.error('Error updating client:', error);
+        alert(`Error saving: ${error.message}`);
       } else {
         setEditingId(null);
         resetForm();
@@ -74,6 +75,7 @@ export default function ClientsAdmin() {
 
       if (error) {
         console.error('Error creating client:', error);
+        alert(`Error saving: ${error.message}`);
       } else {
         setShowAddForm(false);
         resetForm();
@@ -102,6 +104,7 @@ export default function ClientsAdmin() {
 
     if (error) {
       console.error('Error deleting client:', error);
+      alert(`Error deleting: ${error.message}`);
     } else {
       fetchClients();
     }

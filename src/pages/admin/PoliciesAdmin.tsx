@@ -84,7 +84,12 @@ export default function PoliciesAdmin() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure?')) {
-      await supabase.from('policies').delete().eq('id', id);
+      const { error } = await supabase.from('policies').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting:', error);
+        alert(`Error deleting: ${error.message}`);
+        return;
+      }
       fetchPolicies();
     }
   };
