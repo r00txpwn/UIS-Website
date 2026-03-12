@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { FileText } from 'lucide-react';
 
+// PDF.js worker for rendering first page to canvas
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
