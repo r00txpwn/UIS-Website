@@ -40,8 +40,8 @@ export default function UsersAdmin() {
         setEmail('');
         setPassword('');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to create user');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create user');
     } finally {
       setLoading(false);
     }
