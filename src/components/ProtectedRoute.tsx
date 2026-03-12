@@ -18,6 +18,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { data: { user } } = await supabase.auth.getUser();
     setAuthenticated(!!user);
     setLoading(false);
+    // #region agent log
+    fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'ProtectedRoute.tsx:checkAuth',message:'Auth check',data:{authenticated:!!user},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
+    // #endregion
   };
 
   if (loading) {

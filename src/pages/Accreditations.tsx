@@ -14,12 +14,15 @@ export default function Accreditations() {
 
   useEffect(() => {
     const fetchAccreditations = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('accreditations')
         .select('*')
         .order('display_order', { ascending: true });
 
       if (data) setAccreditations(data);
+      // #region agent log
+      fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'Accreditations.tsx:fetch',message:'Accreditations fetch',data:{count:data?.length??0,error:error?.message??null},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
+      // #endregion
     };
 
     fetchAccreditations();
