@@ -11,6 +11,7 @@ interface NewsPost {
   content: string | null;
   image_url: string | null;
   published: boolean;
+  featured_on_home: boolean;
   published_at: string;
   created_at: string;
   updated_at: string;
@@ -158,6 +159,7 @@ export default function NewsAdmin() {
       content: '',
       image_url: null,
       published: true,
+      featured_on_home: false,
       published_at: new Date().toISOString(),
     });
   };
@@ -263,6 +265,15 @@ export default function NewsAdmin() {
                     className="rounded border-gray-300"
                   />
                   <span className="text-sm font-medium">Published</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured_on_home ?? false}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, featured_on_home: e.target.checked }))}
+                    className="rounded border-gray-300"
+                  />
+                  <span className="text-sm font-medium">Show on homepage</span>
                 </label>
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">Publish date & time</label>
