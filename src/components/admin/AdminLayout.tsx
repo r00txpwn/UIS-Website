@@ -7,6 +7,7 @@ import {
   Award,
   FileCheck,
   Package,
+  Users,
   LogOut,
   Menu,
   X
@@ -46,6 +47,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/accreditations', icon: Award, label: 'Accreditations' },
     { path: '/admin/policies', icon: FileCheck, label: 'Policies' },
     { path: '/admin/products', icon: Package, label: 'Products' },
+    { path: '/admin/users', icon: Users, label: 'Users' },
   ];
 
   return (

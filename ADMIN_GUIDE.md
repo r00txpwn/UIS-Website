@@ -1,24 +1,36 @@
 # UIS CMS - Admin Guide
 
-## Getting Started
+## CRITICAL: First Time Setup
 
-### 1. Create Your Admin Account
+Since there is NO public signup page (for security), you need to create the first admin user directly in Supabase:
 
-1. Visit `/signup` in your browser
-2. Enter your email and password
-3. Click "Create Admin Account"
-4. You'll be redirected to the login page
+### Option 1: Use Supabase Dashboard (Recommended)
+1. Go to your Supabase project dashboard
+2. Navigate to Authentication > Users
+3. Click "Add user" or "Invite user"
+4. Enter email and password
+5. The user will be created with access to the admin panel
 
-### 2. Login to Admin Panel
+### Option 2: After First User is Created
+Once you have your first admin account:
+1. Login at `/login`
+2. Go to `/admin/users`
+3. Use the secure admin panel to create additional admin users
 
-1. Visit `/login` in your browser
+## Security Model
+
+- **NO PUBLIC SIGNUP**: The `/signup` route has been removed for security
+- **Protected Admin Panel**: All `/admin/*` routes require authentication
+- **User Creation**: Only logged-in admins can create new users via `/admin/users`
+
+## Admin Panel Access
+
+### Login
+1. Visit `/login`
 2. Enter your credentials
-3. Click "Sign In"
-4. You'll be redirected to `/admin` (the dashboard)
+3. You'll be redirected to `/admin` (the dashboard)
 
 ## Admin Panel Structure
-
-The admin panel is located at `/admin` and includes the following sections:
 
 ### Dashboard (`/admin`)
 - Overview of all content
@@ -54,6 +66,12 @@ The admin panel is located at `/admin` and includes the following sections:
 - Add descriptions
 - Set display order
 
+### User Management (`/admin/users`)
+- **SECURE**: Only accessible when logged in
+- Create new admin users
+- Set email and password for new users
+- All created users have admin privileges
+
 ## Database Structure
 
 The CMS uses Supabase with the following tables:
@@ -79,17 +97,19 @@ The following storage buckets are available:
 ## Important Notes
 
 1. All admin routes are protected and require authentication
-2. Images and PDFs should be uploaded to the public directory or use Supabase storage
-3. Use meaningful slugs for services (e.g., "fleet-management")
-4. Set appropriate display_order values to control content ordering
-5. All content is published to the public website immediately when marked as "published"
+2. There is NO public signup - users must be created via Supabase dashboard or `/admin/users`
+3. Images and PDFs should be uploaded to the public directory or use Supabase storage
+4. Use meaningful slugs for services (e.g., "fleet-management")
+5. Set appropriate display_order values to control content ordering
+6. All content is published to the public website immediately when marked as "published"
 
-## Security
+## Security Features
 
-- Row Level Security (RLS) is enabled on all tables
-- Only authenticated users can modify content
-- Public users can only read published content
-- All storage buckets have appropriate read/write policies
+- **No Public Signup**: Prevents unauthorized user creation
+- **Protected Routes**: All admin pages require authentication
+- **Row Level Security (RLS)**: Enabled on all database tables
+- **Secure User Creation**: Only authenticated admins can create new users
+- **Storage Policies**: Proper read/write permissions on all buckets
 
 ## Support
 

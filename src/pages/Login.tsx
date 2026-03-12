@@ -98,11 +98,6 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <a href="/signup" className="text-sm text-blue-600 hover:text-blue-700">
-              Need an account? Create admin account
-            </a>
-          </div>
         </div>
       </div>
     </div>

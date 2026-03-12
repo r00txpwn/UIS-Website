@@ -10,20 +10,19 @@ import About from './pages/About';
 import BusinessEthics from './pages/BusinessEthics';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
-import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/admin/Dashboard';
 import ServicesAdmin from './pages/admin/ServicesAdmin';
 import AccreditationsAdmin from './pages/admin/AccreditationsAdmin';
 import PoliciesAdmin from './pages/admin/PoliciesAdmin';
 import ProductsAdmin from './pages/admin/ProductsAdmin';
+import UsersAdmin from './pages/admin/UsersAdmin';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -31,6 +30,7 @@ function App() {
         <Route path="/admin/accreditations" element={<ProtectedRoute><AccreditationsAdmin /></ProtectedRoute>} />
         <Route path="/admin/policies" element={<ProtectedRoute><PoliciesAdmin /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><ProductsAdmin /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute><UsersAdmin /></ProtectedRoute>} />
 
         {/* Public Routes */}
         <Route path="/*" element={

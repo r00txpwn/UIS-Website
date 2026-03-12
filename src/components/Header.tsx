@@ -24,7 +24,7 @@ export default function Header() {
   return (
     <header className="bg-white border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center group gap-4" onClick={closeMobileMenu}>
+        <Link to="/" className="flex items-center group" onClick={closeMobileMenu}>
           <div className="relative">
             <img
               src="/images/logos/UIS-LOgo-300x300.jpg"
@@ -32,9 +32,6 @@ export default function Header() {
               className="h-14 w-auto transition-transform duration-300 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/5 rounded-lg transition-colors duration-300"></div>
-          </div>
-          <div className="hidden lg:block">
-            <div className="text-xl font-bold text-gray-900 leading-tight">Excellence in Industrial Services</div>
           </div>
         </Link>
 
