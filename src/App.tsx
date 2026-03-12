@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Clients from './pages/Clients';
+import Products from './pages/Products';
 import ServiceDetail from './pages/ServiceDetail';
 import Accreditations from './pages/Accreditations';
 import About from './pages/About';
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/clients" element={<Clients />} />
+                <Route path="/products" element={<Products />} />
                 <Route path="/accreditations" element={<Accreditations />} />
                 <Route path="/business-ethics" element={<BusinessEthics />} />
                 <Route path="/contact" element={<Contact />} />

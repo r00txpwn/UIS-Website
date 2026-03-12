@@ -106,6 +106,22 @@ export default function Header() {
             }`}></div>
           </Link>
 
+          <Link
+            to="/products"
+            className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
+              isActive('/products')
+                ? 'text-blue-600 font-semibold'
+                : 'text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            <span className="relative z-10">Products</span>
+            <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
+              isActive('/products')
+                ? 'bg-blue-50'
+                : 'bg-gray-50/0 group-hover:bg-gray-50'
+            }`}></div>
+          </Link>
+
           <div
             className="relative"
             onMouseEnter={() => setServicesOpen(true)}
@@ -225,6 +241,13 @@ export default function Header() {
               className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/clients') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
             >
               Clients
+            </Link>
+            <Link
+              to="/products"
+              onClick={closeMobileMenu}
+              className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/products') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
+              Products
             </Link>
 
             <div>
