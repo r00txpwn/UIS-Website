@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileCheck, FileText, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import PolicyPdfPreview from '../components/PolicyPdfPreview';
 
 interface Policy {
   id: string;
@@ -70,11 +71,12 @@ export default function Policies() {
                 className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border-2 border-gray-100 hover:border-blue-200"
               >
                 {policy.pdf_url ? (
-                  <div className="aspect-video bg-slate-100 border-b border-gray-100">
-                    <iframe
-                      src={policy.pdf_url}
-                      title={`Preview: ${policy.title}`}
+                  <div className="aspect-video bg-slate-100 border-b border-gray-100 min-h-[200px]">
+                    <PolicyPdfPreview
+                      pdfUrl={policy.pdf_url}
+                      title={policy.title}
                       className="w-full h-full min-h-[200px]"
+                      maxWidth={400}
                     />
                   </div>
                 ) : (
