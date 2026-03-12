@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS news_posts (
   content text,
   image_url text,
   published boolean DEFAULT true,
+  featured_on_home boolean NOT NULL DEFAULT false,
   published_at timestamptz NOT NULL DEFAULT now(),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
