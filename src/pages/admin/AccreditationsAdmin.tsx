@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText, Image } from 'lucide-react';
+import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText } from 'lucide-react';
 
 interface Accreditation {
   id: string;
@@ -91,23 +91,38 @@ export default function AccreditationsAdmin() {
   const handleSave = async () => {
     setLoading(true);
     try {
+      let result;
       if (editingId === 'new') {
-        await supabase.from('accreditations').insert([formData]);
+        result = await supabase.from('accreditations').insert([formData]);
       } else if (editingId) {
-        await supabase.from('accreditations').update(formData).eq('id', editingId);
+        result = await supabase.from('accreditations').update(formData).eq('id', editingId);
       }
+
+      if (result?.error) {
+        console.error('Error saving:', result.error);
+        alert(`Error saving: ${result.error.message}`);
+        setLoading(false);
+        return;
+      }
+
       await fetchAccreditations();
       setEditingId(null);
       setFormData({});
     } catch (error) {
       console.error('Error saving:', error);
+      alert(`Error: ${error}`);
     }
     setLoading(false);
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure?')) {
-      await supabase.from('accreditations').delete().eq('id', id);
+      const { error } = await supabase.from('accreditations').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting:', error);
+        alert(`Error deleting: ${error.message}`);
+        return;
+      }
       fetchAccreditations();
     }
   };
