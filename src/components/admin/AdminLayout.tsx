@@ -13,7 +13,11 @@ import {
   X,
   Building2,
   Truck,
-  Newspaper
+  Newspaper,
+  Image,
+  Settings,
+  Link2,
+  MessageSquare
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -50,6 +54,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/policies', icon: FileCheck, label: 'Policies' },
     { path: '/admin/products', icon: Package, label: 'Products' },
     { path: '/admin/news', icon: Newspaper, label: 'News and Events' },
+    { path: '/admin/homepage-slides', icon: Image, label: 'Homepage Slides' },
+    { path: '/admin/site-settings', icon: Settings, label: 'Site Settings' },
+    { path: '/admin/footer-links', icon: Link2, label: 'Footer Links' },
+    { path: '/admin/contact-messages', icon: MessageSquare, label: 'Contact Messages' },
     { path: '/admin/clients', icon: Building2, label: 'Clients' },
     { path: '/admin/suppliers', icon: Truck, label: 'Suppliers' },
     { path: '/admin/users', icon: Users, label: 'Users' },
