@@ -20,9 +20,19 @@ interface Accreditation {
   logo_url: string;
 }
 
+interface NewsSummary {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  image_url: string | null;
+  published_at: string;
+}
+
 export default function Home() {
   const [services, setServices] = useState<Service[]>([]);
   const [featuredAccreditations, setFeaturedAccreditations] = useState<Accreditation[]>([]);
+  const [latestNews, setLatestNews] = useState<NewsSummary[]>([]);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -34,6 +44,9 @@ export default function Home() {
         .limit(8);
 
       if (data) setServices(data);
+      // #region agent log
+      fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'Home.tsx:fetchServices',message:'Home services fetch',data:{count:data?.length??0,hasError:false},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
     };
 
     const fetchAccreditations = async () => {
@@ -44,10 +57,50 @@ export default function Home() {
         .limit(4);
 
       if (data) setFeaturedAccreditations(data);
+      // #region agent log
+      fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'Home.tsx:fetchAccreditations',message:'Home accreditations fetch',data:{count:data?.length??0,hasError:false},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
+    };
+
+    const fetchHomepageNews = async () => {
+      // Try featured posts first
+      const { data: featured, error: featuredError } = await supabase
+        .from('news_posts')
+        .select('id, title, slug, excerpt, image_url, published_at')
+        .eq('published', true)
+        .eq('featured_on_home', true)
+        .order('published_at', { ascending: false })
+        .limit(3);
+
+      if (featuredError) {
+        console.error('Error loading homepage news (featured):', featuredError);
+        return;
+      }
+
+      if (featured && featured.length > 0) {
+        setLatestNews(featured);
+        return;
+      }
+
+      // Fallback to latest published posts
+      const { data: latest, error: latestError } = await supabase
+        .from('news_posts')
+        .select('id, title, slug, excerpt, image_url, published_at')
+        .eq('published', true)
+        .order('published_at', { ascending: false })
+        .limit(3);
+
+      if (latestError) {
+        console.error('Error loading homepage news (latest):', latestError);
+        return;
+      }
+
+      setLatestNews(latest ?? []);
     };
 
     fetchServices();
     fetchAccreditations();
+    fetchHomepageNews();
   }, []);
 
   return (
@@ -67,6 +120,46 @@ export default function Home() {
           ))}
         </div>
       </Section>
+
+      {latestNews.length > 0 && (
+        <Section title="Latest News & Events">
+          <div className="grid md:grid-cols-3 gap-8">
+            {latestNews.map((post) => (
+              <Link
+                key={post.id}
+                to={`/news/${post.slug}`}
+                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200"
+              >
+                <div className="aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
+                  {post.image_url ? (
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-sm">No image</span>
+                  )}
+                </div>
+                <div className="p-4">
+                  <p className="text-xs text-gray-500 mb-1">
+                    {new Date(post.published_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                  </p>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 line-clamp-3">
+                    {post.excerpt || ''}
+                  </p>
+                  <span className="inline-block mt-2 text-xs text-blue-600 font-medium group-hover:underline">
+                    Read more →
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Section>
+      )}
 
       <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-blue-900 py-20">
         <div className="max-w-7xl mx-auto px-4">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileCheck, FileText, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import PolicyPdfPreview from '../components/PolicyPdfPreview';
 
 interface Policy {
   id: string;
@@ -69,10 +70,21 @@ export default function Policies() {
                 key={policy.id}
                 className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border-2 border-gray-100 hover:border-blue-200"
               >
-                <div className="p-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <FileText className="w-8 h-8 text-blue-600" />
+                {policy.pdf_url ? (
+                  <div className="aspect-video bg-slate-100 border-b border-gray-100 min-h-[200px]">
+                    <PolicyPdfPreview
+                      pdfUrl={policy.pdf_url}
+                      title={policy.title}
+                      className="w-full h-full min-h-[200px]"
+                      maxWidth={400}
+                    />
                   </div>
+                ) : (
+                  <div className="aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                    <FileText className="w-16 h-16 text-blue-300" />
+                  </div>
+                )}
+                <div className="p-8">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">
                     {policy.title}
                   </h3>

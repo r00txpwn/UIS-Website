@@ -35,6 +35,10 @@ export default function Dashboard() {
       clients: clients.count || 0,
       suppliers: suppliers.count || 0
     });
+    // #region agent log
+    const errors = [services.error?.message,accreditations.error?.message,policies.error?.message,products.error?.message,clients.error?.message,suppliers.error?.message].filter(Boolean);
+    fetch('http://127.0.0.1:7854/ingest/ef127c7f-c9d5-4790-868a-0089cfe19cfd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'04450d'},body:JSON.stringify({sessionId:'04450d',location:'Dashboard.tsx:fetchStats',message:'Dashboard stats',data:{services:services.count??0,accreditations:accreditations.count??0,policies:policies.count??0,products:products.count??0,clients:clients.count??0,suppliers:suppliers.count??0,errors:errors},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
+    // #endregion
   };
 
   const statCards = [

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText, Image } from 'lucide-react';
+import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText } from 'lucide-react';
 
 interface Accreditation {
   id: string;
@@ -17,6 +17,8 @@ export default function AccreditationsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Accreditation>>({});
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
 
@@ -25,11 +27,18 @@ export default function AccreditationsAdmin() {
   }, []);
 
   const fetchAccreditations = async () => {
-    const { data } = await supabase
+    setFetchError(null);
+    setFetchLoading(true);
+    const { data, error } = await supabase
       .from('accreditations')
       .select('*')
       .order('display_order');
-    if (data) setAccreditations(data);
+    setFetchLoading(false);
+    if (error) {
+      setFetchError(error.message);
+      return;
+    }
+    setAccreditations(data ?? []);
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,23 +100,38 @@ export default function AccreditationsAdmin() {
   const handleSave = async () => {
     setLoading(true);
     try {
+      let result;
       if (editingId === 'new') {
-        await supabase.from('accreditations').insert([formData]);
+        result = await supabase.from('accreditations').insert([formData]);
       } else if (editingId) {
-        await supabase.from('accreditations').update(formData).eq('id', editingId);
+        result = await supabase.from('accreditations').update(formData).eq('id', editingId);
       }
+
+      if (result?.error) {
+        console.error('Error saving:', result.error);
+        alert(`Error saving: ${result.error.message}`);
+        setLoading(false);
+        return;
+      }
+
       await fetchAccreditations();
       setEditingId(null);
       setFormData({});
     } catch (error) {
       console.error('Error saving:', error);
+      alert(`Error: ${error}`);
     }
     setLoading(false);
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure?')) {
-      await supabase.from('accreditations').delete().eq('id', id);
+      const { error } = await supabase.from('accreditations').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting:', error);
+        alert(`Error deleting: ${error.message}`);
+        return;
+      }
       fetchAccreditations();
     }
   };
@@ -268,6 +292,21 @@ export default function AccreditationsAdmin() {
         )}
 
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          {fetchError && (
+            <div className="p-4 bg-red-50 border-b border-red-200 text-red-800 text-sm">
+              Failed to load: {fetchError}
+              <button
+                type="button"
+                onClick={() => fetchAccreditations()}
+                className="ml-3 underline font-medium"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {fetchLoading ? (
+            <div className="p-8 text-center text-slate-500">Loading accreditations...</div>
+          ) : (
           <table className="w-full">
             <thead className="bg-slate-50 border-b">
               <tr>
@@ -299,6 +338,7 @@ export default function AccreditationsAdmin() {
               ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </AdminLayout>

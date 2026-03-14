@@ -12,7 +12,11 @@ import {
   Menu,
   X,
   Building2,
-  Truck
+  Truck,
+  Newspaper,
+  Image,
+  Settings,
+  MessageSquare
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -26,17 +30,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/login');
+      } else {
+        setUserEmail(user.email || '');
+      }
+    };
     checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate('/login');
-    } else {
-      setUserEmail(user.email || '');
-    }
-  };
+  }, [navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -49,6 +52,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/accreditations', icon: Award, label: 'Accreditations' },
     { path: '/admin/policies', icon: FileCheck, label: 'Policies' },
     { path: '/admin/products', icon: Package, label: 'Products' },
+    { path: '/admin/news', icon: Newspaper, label: 'News and Events' },
+    { path: '/admin/homepage-slides', icon: Image, label: 'Homepage Slides' },
+    { path: '/admin/site-settings', icon: Settings, label: 'Site Settings' },
+    { path: '/admin/contact-messages', icon: MessageSquare, label: 'Contact Messages' },
     { path: '/admin/clients', icon: Building2, label: 'Clients' },
     { path: '/admin/suppliers', icon: Truck, label: 'Suppliers' },
     { path: '/admin/users', icon: Users, label: 'Users' },

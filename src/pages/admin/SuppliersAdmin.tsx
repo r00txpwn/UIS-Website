@@ -22,6 +22,8 @@ export default function SuppliersAdmin() {
     logo_url: '',
     display_order: 0
   });
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSuppliers();
@@ -58,6 +60,7 @@ export default function SuppliersAdmin() {
 
       if (error) {
         console.error('Error updating supplier:', error);
+        alert(`Error saving: ${error.message}`);
       } else {
         setEditingId(null);
         resetForm();
@@ -74,6 +77,7 @@ export default function SuppliersAdmin() {
 
       if (error) {
         console.error('Error creating supplier:', error);
+        alert(`Error saving: ${error.message}`);
       } else {
         setShowAddForm(false);
         resetForm();
@@ -102,6 +106,7 @@ export default function SuppliersAdmin() {
 
     if (error) {
       console.error('Error deleting supplier:', error);
+      alert(`Error deleting: ${error.message}`);
     } else {
       fetchSuppliers();
     }
@@ -109,6 +114,7 @@ export default function SuppliersAdmin() {
 
   const resetForm = () => {
     setFormData({ name: '', logo_url: '', display_order: 0 });
+    setUploadError(null);
     setEditingId(null);
     setShowAddForm(false);
   };
@@ -117,24 +123,31 @@ export default function SuppliersAdmin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `suppliers/${fileName}`;
+    setUploadError(null);
+    setUploadingLogo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `suppliers/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('images')
-      .upload(filePath, file);
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
 
-    if (uploadError) {
-      console.error('Error uploading image:', uploadError);
-      return;
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      setFormData((prev) => ({ ...prev, logo_url: publicUrl }));
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploadingLogo(false);
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('images')
-      .getPublicUrl(filePath);
-
-    setFormData({ ...formData, logo_url: publicUrl });
+    e.target.value = '';
   };
 
   return (
@@ -149,7 +162,8 @@ export default function SuppliersAdmin() {
             onClick={() => {
               setShowAddForm(true);
               setEditingId(null);
-              resetForm();
+              setFormData({ name: '', logo_url: '', display_order: 0 });
+              setUploadError(null);
             }}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
@@ -179,28 +193,39 @@ export default function SuppliersAdmin() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Logo URL
+                  Logo
                 </label>
                 <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={formData.logo_url}
-                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                    placeholder="https://example.com/logo.png or upload below"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition">
-                      <Upload className="w-4 h-4" />
-                      Upload Image
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
+                  {formData.logo_url && (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={formData.logo_url}
+                        alt="Logo preview"
+                        className="h-16 w-auto object-contain border border-slate-200 rounded-lg bg-white p-2"
                       />
-                    </label>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, logo_url: '' }))}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <label className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition w-fit">
+                    <Upload className="w-4 h-4" />
+                    {uploadingLogo ? 'Uploading...' : 'Upload Image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingLogo}
+                    />
+                  </label>
+                  {uploadError && (
+                    <p className="text-sm text-red-600">{uploadError}</p>
+                  )}
                 </div>
               </div>
 

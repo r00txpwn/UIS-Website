@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
-import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText, Image } from 'lucide-react';
+import { Plus, CreditCard as Edit2, Trash2, Save, X, Upload, FileText } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -150,7 +150,12 @@ export default function ProductsAdmin() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure?')) {
-      await supabase.from('products').delete().eq('id', id);
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting:', error);
+        alert(`Error deleting: ${error.message}`);
+        return;
+      }
       fetchProducts();
     }
   };

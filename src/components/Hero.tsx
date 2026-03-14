@@ -1,22 +1,62 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+
+interface HeroSlide {
+  image: string;
+  title: string;
+  subtitle?: string | null;
+  buttonLabel?: string | null;
+  buttonUrl?: string | null;
+}
+
+const defaultSlides: HeroSlide[] = [
+  {
+    image: '/images/Screenshot_2.png',
+    title: 'Your Global Partner for Integrated Rigging & NDT Solutions'
+  },
+  {
+    image: '/images/hero-bg.svg',
+    title: 'Certified Quality & Safety Standards'
+  },
+  {
+    image: '/images/Screenshot_2.png',
+    title: 'Trusted Partner in Oil & Gas Industry'
+  }
+];
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState<HeroSlide[]>(defaultSlides);
 
-  const slides = [
-    {
-      image: '/images/Screenshot_2.png',
-      title: 'Your Global Partner for Integrated Rigging & NDT Solutions'
-    },
-    {
-      image: '/images/hero-bg.svg',
-      title: 'Certified Quality & Safety Standards'
-    },
-    {
-      image: '/images/Screenshot_2.png',
-      title: 'Trusted Partner in Oil & Gas Industry'
-    }
-  ];
+  useEffect(() => {
+    const fetchSlides = async () => {
+      const { data, error } = await supabase
+        .from('homepage_slides')
+        .select('title, subtitle, image_url, button_label, button_url')
+        .eq('published', true)
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error('Error loading hero slides:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const mapped: HeroSlide[] = data.map((row) => ({
+          image: row.image_url,
+          title: row.title,
+          subtitle: row.subtitle,
+          buttonLabel: row.button_label,
+          buttonUrl: row.button_url,
+        }));
+        setSlides(mapped);
+        setCurrentSlide(0);
+      }
+    };
+
+    fetchSlides();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,9 +89,24 @@ export default function Hero() {
           </div>
 
           <div className="relative h-full flex items-center justify-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-white text-center px-4 drop-shadow-lg">
-              {slide.title}
-            </h1>
+            <div className="text-center px-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-white drop-shadow-lg mb-4">
+                {slide.title}
+              </h1>
+              {slide.subtitle && (
+                <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-6">
+                  {slide.subtitle}
+                </p>
+              )}
+              {slide.buttonLabel && slide.buttonUrl && (
+                <Link
+                  to={slide.buttonUrl}
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-600/30 transition"
+                >
+                  {slide.buttonLabel}
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       ))}

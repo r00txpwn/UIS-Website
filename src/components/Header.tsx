@@ -9,6 +9,12 @@ interface Service {
   description: string;
 }
 
+interface SiteSettings {
+  logo_url: string | null;
+  header_contact_label: string | null;
+  header_contact_url: string | null;
+}
+
 export default function Header() {
   const location = useLocation();
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -17,6 +23,7 @@ export default function Header() {
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -29,7 +36,29 @@ export default function Header() {
       if (data) setServices(data);
     };
 
+    const fetchSettings = async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('logo_url, header_contact_label, header_contact_url')
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error loading site settings for header:', error);
+        return;
+      }
+
+      if (data) {
+        setSiteSettings({
+          logo_url: data.logo_url ?? null,
+          header_contact_label: data.header_contact_label ?? null,
+          header_contact_url: data.header_contact_url ?? null,
+        });
+      }
+    };
+
     fetchServices();
+    fetchSettings();
   }, []);
 
   const isActive = (path: string) => {
@@ -38,6 +67,10 @@ export default function Header() {
 
   const isServicesActive = () => {
     return location.pathname.startsWith('/services');
+  };
+
+  const isNewsActive = () => {
+    return location.pathname.startsWith('/news');
   };
 
   const closeMobileMenu = () => {
@@ -52,7 +85,7 @@ export default function Header() {
         <Link to="/" className="flex items-center group" onClick={closeMobileMenu}>
           <div className="relative">
             <img
-              src="/images/logos/UIS-LOgo-300x300.jpg"
+              src={siteSettings?.logo_url || '/images/logos/UIS-LOgo-300x300.jpg'}
               alt="UIS Logo"
               className="h-14 w-auto transition-transform duration-300 group-hover:scale-105"
             />
@@ -233,10 +266,26 @@ export default function Header() {
           </Link>
 
           <Link
-            to="/contact"
+            to="/news"
+            className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
+              isNewsActive()
+                ? 'text-blue-600 font-semibold'
+                : 'text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            <span className="relative z-10">News and Events</span>
+            <div className={`absolute inset-0 rounded-lg transition-all duration-300 ${
+              isNewsActive()
+                ? 'bg-blue-50'
+                : 'bg-gray-50/0 group-hover:bg-gray-50'
+            }`}></div>
+          </Link>
+
+          <Link
+            to={siteSettings?.header_contact_url || '/contact'}
             className="relative px-4 py-2 ml-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/30 hover:-translate-y-0.5 font-medium"
           >
-            <span className="relative z-10">Contact</span>
+            <span className="relative z-10">{siteSettings?.header_contact_label || 'Contact'}</span>
             <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
           </Link>
         </nav>
@@ -343,6 +392,13 @@ export default function Header() {
               className={`block px-4 py-3 rounded-lg transition-colors ${isActive('/business-ethics') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
             >
               Business Ethics
+            </Link>
+            <Link
+              to="/news"
+              onClick={closeMobileMenu}
+              className={`block px-4 py-3 rounded-lg transition-colors ${isNewsActive() ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
+              News and Events
             </Link>
             <Link
               to="/contact"

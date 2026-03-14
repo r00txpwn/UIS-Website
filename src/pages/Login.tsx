@@ -26,8 +26,8 @@ export default function Login() {
       if (data.user) {
         navigate('/admin');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to login');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to login');
     } finally {
       setLoading(false);
     }
