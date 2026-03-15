@@ -30,7 +30,7 @@ export default function News() {
     const fetchPosts = async () => {
       const { data, error } = await supabase
         .from('news_posts')
-        .select('id, title, slug, excerpt, image_url, published_at')
+        .select('id, title, slug, excerpt, content, image_url, published, published_at')
         .eq('published', true)
         .order('published_at', { ascending: false });
 

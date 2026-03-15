@@ -54,15 +54,15 @@ export default function Dashboard() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Welcome to UIS CMS</h1>
-          <p className="text-slate-600 mt-2">Manage your website content from this dashboard</p>
+          <h1 className="text-2xl font-bold text-slate-900">Welcome to UIS CMS</h1>
+          <p className="text-slate-600 mt-1">Manage your website content from this dashboard</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+              <div key={stat.label} className="bg-white rounded-lg shadow-sm p-5 border border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">{stat.label}</p>
@@ -77,9 +77,9 @@ export default function Dashboard() {
           })}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <a
               href="/admin/services"
               className="flex items-center gap-3 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition"

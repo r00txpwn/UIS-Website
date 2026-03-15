@@ -50,7 +50,7 @@ export default function PolicyPdfPreview({ pdfUrl, title, className = '', maxWid
           return;
         }
 
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        await page.render({ canvasContext: ctx, viewport, canvas }).promise;
         if (cancelled) return;
 
         const dataUrl = canvas.toDataURL('image/png');
