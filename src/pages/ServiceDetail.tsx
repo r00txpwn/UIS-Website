@@ -23,10 +23,6 @@ export default function ServiceDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-
     const fetchService = async () => {
       if (!slug) return;
 
@@ -54,13 +50,23 @@ export default function ServiceDetail() {
       }
 
       setLoading(false);
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
     };
 
     fetchService();
   }, [slug]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active.closest('footer, header')) {
+      active.blur();
+    }
+
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [loading, slug]);
 
   if (loading) {
     return (

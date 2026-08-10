@@ -53,7 +53,7 @@ function App() {
         <Route path="/*" element={
           <div className="min-h-screen bg-white flex flex-col">
             <Header />
-            <main className="flex-grow">
+            <main id="main-content" tabIndex={-1} className="flex-grow outline-none">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
