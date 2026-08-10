@@ -88,10 +88,22 @@ export default function Footer() {
             <h3 className="text-white text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/services/fleet-management" className="text-sm hover:text-white transition-colors">Fleet Management</Link>
+                <Link
+                  to="/services/fleet-management"
+                  onClick={() => window.scrollTo(0, 0)}
+                  className="text-sm hover:text-white transition-colors"
+                >
+                  Fleet Management
+                </Link>
               </li>
               <li>
-                <Link to="/services/ndt-inspection" className="text-sm hover:text-white transition-colors">NDT Inspection</Link>
+                <Link
+                  to="/services/ndt-inspection"
+                  onClick={() => window.scrollTo(0, 0)}
+                  className="text-sm hover:text-white transition-colors"
+                >
+                  NDT Inspection
+                </Link>
               </li>
             </ul>
           </div>

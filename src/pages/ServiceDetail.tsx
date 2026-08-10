@@ -23,8 +23,16 @@ export default function ServiceDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     const fetchService = async () => {
       if (!slug) return;
+
+      setLoading(true);
+      setService(null);
+      setImages([]);
 
       const { data: serviceData } = await supabase
         .from('services')
@@ -46,6 +54,9 @@ export default function ServiceDetail() {
       }
 
       setLoading(false);
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     };
 
     fetchService();
