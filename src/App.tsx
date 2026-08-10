@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Clients from './pages/Clients';
 import Products from './pages/Products';
@@ -30,6 +31,7 @@ import ContactMessagesAdmin from './pages/admin/ContactMessagesAdmin';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />
 
